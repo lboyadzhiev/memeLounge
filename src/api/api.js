@@ -48,7 +48,7 @@ export async function get(url) {
 }
 
 export async function post(url, data) {
-    return await request(url, getOptions('post', data));
+    return await request(url, getOptions('POST', data));
 }
 
 export async function put(url, data) {
@@ -57,4 +57,17 @@ export async function put(url, data) {
 
 export async function del(url) {
     return await request(url, getOptions('delete'));
+}
+
+export async function login(email, password) {
+    const result = await post(settings.host + '/users/login', {
+        email,
+        password,
+    });
+
+    sessionStorage.setItem('email', result.email);
+    sessionStorage.setItem('authToken', result.accessToken);
+    sessionStorage.setItem('userId', result._id);
+
+    return result;
 }
