@@ -23,13 +23,13 @@ async function request(url, options) {
     }
 }
 
-function getOptions(method = 'get', body) {
+function getOptions(method = 'GET', body) {
     const options = {
         method,
         headers: {},
     };
 
-    const token = sessionStorage.getItem('outhToken');
+    const token = sessionStorage.getItem('authToken');
 
     if (token != null) {
         options.headers['X-Authorization'] = token;
@@ -83,6 +83,16 @@ export async function register(username, email, password, gender) {
     sessionStorage.setItem('email', result.email);
     sessionStorage.setItem('authToken', result.accessToken);
     sessionStorage.setItem('userId', result._id);
+
+    return result;
+}
+
+export async function logout() {
+    const result = await get(settings.host + '/users/logout');
+
+    sessionStorage.removeItem('email');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userId');
 
     return result;
 }
