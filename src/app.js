@@ -6,11 +6,13 @@ import { homePage } from './views/home.js';
 import { loginPage } from './views/login.js';
 import { registerPage } from './views/register.js';
 import { catalogPage } from './views/catalog.js';
+import { createPage } from './views/create.js';
 
 page('/', decorateContext, homePage);
 page('/login', decorateContext, loginPage);
 page('/register', decorateContext, registerPage);
 page('/catalog', decorateContext, catalogPage);
+page('/create', decorateContext, createPage);
 
 const main = document.querySelector('main');
 

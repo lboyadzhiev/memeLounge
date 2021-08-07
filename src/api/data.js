@@ -13,3 +13,7 @@ export const logout = api.logout;
 export async function getMemes() {
     return await api.get(host + '/data/memes?sortBy=_createdOn%20desc');
 }
+
+export async function createMeme(meme) {
+    return await api.post(host + '/data/memes', meme);
+}
