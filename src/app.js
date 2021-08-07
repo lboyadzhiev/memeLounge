@@ -5,10 +5,12 @@ import { logout } from './api/data.js';
 import { homePage } from './views/home.js';
 import { loginPage } from './views/login.js';
 import { registerPage } from './views/register.js';
+import { catalogPage } from './views/catalog.js';
 
 page('/', decorateContext, homePage);
 page('/login', decorateContext, loginPage);
 page('/register', decorateContext, registerPage);
+page('/catalog', decorateContext, catalogPage);
 
 const main = document.querySelector('main');
 
