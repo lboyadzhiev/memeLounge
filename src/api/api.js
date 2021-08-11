@@ -1,3 +1,6 @@
+//@ts-check
+import { getOptions } from '../utilites.js';
+
 export const settings = {
     host: '',
 };
@@ -23,32 +26,12 @@ async function request(url, options) {
     }
 }
 
-function getOptions(method = 'GET', body) {
-    const options = {
-        method,
-        headers: {},
-    };
-
-    const token = sessionStorage.getItem('authToken');
-
-    if (token != null) {
-        options.headers['X-Authorization'] = token;
-    }
-
-    if (body) {
-        options.headers['Content-Type'] = 'application/json';
-        options.body = JSON.stringify(body);
-    }
-
-    return options;
-}
-
 export async function get(url) {
     return await request(url, getOptions());
 }
 
 export async function post(url, data) {
-    return await request(url, getOptions('POST', data));
+    return await request(url, getOptions('post', data));
 }
 
 export async function put(url, data) {
@@ -60,10 +43,7 @@ export async function del(url) {
 }
 
 export async function login(email, password) {
-    const result = await post(settings.host + '/users/login', {
-        email,
-        password,
-    });
+    const result = await post(settings.host + '/users/login', { email, password });
 
     sessionStorage.setItem('email', result.email);
     sessionStorage.setItem('authToken', result.accessToken);
@@ -83,18 +63,16 @@ export async function register(username, email, password, gender) {
     sessionStorage.setItem('email', result.email);
     sessionStorage.setItem('authToken', result.accessToken);
     sessionStorage.setItem('userId', result._id);
-    sessionStorage.setItem('gender', result.gender);
 
     return result;
 }
 
 export async function logout() {
-    const result = await get(settings.host + '/users/logout');
+    const result = await get(settings.host + '/users/login');
 
     sessionStorage.removeItem('email');
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('gender');
 
     return result;
 }

@@ -41,12 +41,12 @@ export async function registerPage(ctx) {
     async function onSubmit(event) {
         event.preventDefault();
 
-        const formData = new FormData(event.target);
-        const username = formData.get('username');
-        const email = formData.get('email');
-        const password = formData.get('password');
-        const rePass = formData.get('repeatPass');
-        const gender = formData.get('gender');
+        const formData = new FormData(event.target).trim();
+        const username = formData.get('username').trim();
+        const email = formData.get('email').trim();
+        const password = formData.get('password').trim();
+        const rePass = formData.get('repeatPass').trim();
+        const gender = formData.get('gender').trim();
 
         if (!username || !email || !password || !rePass || !gender) {
             return alert('All fields are required!');
