@@ -1,7 +1,8 @@
 import { html } from '../../node_modules/lit-html/lit-html.js';
-import { createMeme } from '../api/data.js';
+import { createItem } from '../api/data.js';
+import { notify } from '../utilites.js';
 
-const createTemplate = (onSubmit) => html`
+const createTempplate = (onSubmit) => html`
     <section id="create-meme">
         <form @submit=${onSubmit} id="create-form">
             <div class="container">
@@ -28,7 +29,7 @@ const createTemplate = (onSubmit) => html`
 `;
 
 export async function createPage(ctx) {
-    ctx.render(createTemplate(onSubmit));
+    ctx.render(createTempplate(onSubmit));
 
     async function onSubmit(event) {
         event.preventDefault();
@@ -36,18 +37,22 @@ export async function createPage(ctx) {
         const formData = new FormData(event.target);
         const title = formData.get('title').trim();
         const description = formData.get('description').trim();
-        const image = formData.get('imageUrl').trim();
+        const imageUrl = formData.get('imageUrl').trim();
 
-        if (!title || !description || !image) {
-            return alert('All fields are requred!');
+        try {
+            if (!title || !description || !imageUrl) {
+                throw new Error('All fields are required!');
+            }
+
+            await createItem({
+                title,
+                description,
+                imageUrl,
+            });
+
+            ctx.page.redirect('/catalog');
+        } catch (err) {
+            notify(err.message);
         }
-
-        await createMeme({
-            title,
-            description,
-            image,
-        });
-
-        ctx.page.redirect('/catalog');
     }
 }

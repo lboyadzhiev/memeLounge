@@ -1,32 +1,33 @@
 import { html } from '../../node_modules/lit-html/lit-html.js';
-import { getMemes } from '../api/data.js';
+import { getItems } from '../api/data.js';
 
-const catalogTemplate = (memes) => html`
+const catalogTemplate = (data) => html`
     <section id="meme-feed">
         <h1>All Memes</h1>
         <div id="memes">
-            ${memes.length == 0
-                ? html`<p class="no-memes">No memes in database.</p>`
-                : memes.map(memeTemplate)}
+            ${data.length === 0
+                ? html` <p class="no-memes">No memes in database.</p>`
+                : data.map(itemTemplate)}
         </div>
     </section>
 `;
 
-const memeTemplate = (meme) => html`
+const itemTemplate = (item) => html`
     <div class="meme">
         <div class="card">
             <div class="info">
-                <p class="meme-title">${meme.title}</p>
-                <img class="meme-image" alt="meme-img" src=${meme.imageUrl} />
+                <p class="meme-title">${item.title}</p>
+                <img class="meme-image" alt="meme-img" src=${item.imageUrl} />
             </div>
             <div id="data-buttons">
-                <a class="button" href="${`/details/${meme._id}`}">Details</a>
+                <a class="button" href="${`/details/${item._id}`}">Details</a>
             </div>
         </div>
     </div>
 `;
-export async function catalogPage(ctx) {
-    const memes = await getMemes();
 
-    ctx.render(catalogTemplate(memes));
+export async function catalogPage(ctx) {
+    const data = await getItems();
+
+    ctx.render(catalogTemplate(data));
 }

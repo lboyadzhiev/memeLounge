@@ -1,8 +1,8 @@
 import { html } from '../../node_modules/lit-html/lit-html.js';
+import { editItem, getItemById } from '../api/data.js';
+import { notify } from '../utilites.js';
 
-import { getMemeById, updateMeme } from '../api/data.js';
-
-const editTemplate = (meme, onSubmit) => html`
+const editTemplate = (item, onSubmit) => html`
     <section id="edit-meme">
         <form @submit=${onSubmit} id="edit-form">
             <h1>Edit Meme</h1>
@@ -13,14 +13,14 @@ const editTemplate = (meme, onSubmit) => html`
                     type="text"
                     placeholder="Enter Title"
                     name="title"
-                    .value=${meme.title}
+                    .value=${item.title}
                 />
                 <label for="description">Description</label>
                 <textarea
                     id="description"
                     placeholder="Enter Description"
                     name="description"
-                    .value=${meme.description}
+                    .value=${item.description}
                 >
                 </textarea>
                 <label for="imageUrl">Image Url</label>
@@ -29,36 +29,40 @@ const editTemplate = (meme, onSubmit) => html`
                     type="text"
                     placeholder="Enter Meme ImageUrl"
                     name="imageUrl"
-                    .value=${meme.imageUrl}
+                    .value=${item.imageUrl}
                 />
                 <input type="submit" class="registerbtn button" value="Edit Meme" />
             </div>
         </form>
     </section>
 `;
-
 export async function editPage(ctx) {
-    const memeId = ctx.params._ownerId;
-    const meme = await getMemeById(memeId);
-    ctx.render(editTemplate(meme, onSubmit));
+    const itemId = ctx.params.id;
+    const item = await getItemById(itemId);
+    ctx.render(editTemplate(item, onSubmit));
 
     async function onSubmit(event) {
         event.preventDefault();
+
         const formData = new FormData(event.target);
         const title = formData.get('title');
         const description = formData.get('description');
         const imageUrl = formData.get('imageUrl');
 
-        if (!title || !description || !imageUrl) {
-            return alert('All fields are required!');
+        try {
+            if (!title || !description || !imageUrl) {
+                throw new Error('All fields are required!');
+            }
+
+            await editItem(itemId, {
+                title,
+                description,
+                imageUrl,
+            });
+
+            ctx.page.redirect('/details/' + itemId);
+        } catch (err) {
+            notify(err.message);
         }
-
-        await updateMeme(memeId, {
-            title,
-            description,
-            imageUrl,
-        });
-
-        ctx.page.redirect('/details/' + memeId);
     }
 }

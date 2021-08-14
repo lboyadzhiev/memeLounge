@@ -1,6 +1,8 @@
-import { html } from '../../node_modules/lit-html/lit-html.js';
+//@ts-check
 
+import { html } from '../../node_modules/lit-html/lit-html.js';
 import { register } from '../api/data.js';
+import { notify } from '../utilites.js';
 
 const registerTemplate = (onSubmit) => html`
     <section id="register">
@@ -34,31 +36,33 @@ const registerTemplate = (onSubmit) => html`
         </form>
     </section>
 `;
-
 export async function registerPage(ctx) {
     ctx.render(registerTemplate(onSubmit));
 
     async function onSubmit(event) {
         event.preventDefault();
 
-        const formData = new FormData(event.target).trim();
-        const username = formData.get('username').trim();
-        const email = formData.get('email').trim();
-        const password = formData.get('password').trim();
-        const rePass = formData.get('repeatPass').trim();
-        const gender = formData.get('gender').trim();
+        const formData = new FormData(event.target);
+        const username = formData.get('username');
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const repeatPass = formData.get('repeatPass');
+        const gender = formData.get('gender');
 
-        if (!username || !email || !password || !rePass || !gender) {
-            return alert('All fields are required!');
+        try {
+            if (!username || !email || !password || !repeatPass || !gender) {
+                throw new Error('All fields are required!!!');
+            }
+
+            if (password != repeatPass) {
+                throw new Error(`Password don't match!`);
+            }
+
+            await register(username, email, password, gender);
+            ctx.setUserNav();
+            ctx.page.redirect('/catalog');
+        } catch (err) {
+            notify(err.message);
         }
-
-        if (password != rePass) {
-            return alert("Password don't match!");
-        }
-
-        await register(username, email, password, gender);
-
-        ctx.setUserNav();
-        ctx.page.redirect('/catalog');
     }
 }

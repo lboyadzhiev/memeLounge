@@ -1,51 +1,34 @@
-import { render } from '../node_modules/lit-html/lit-html.js';
 import page from '../node_modules/page/page.mjs';
 
-import { logout } from './api/data.js';
+import { renderMiddleware } from './utilites.js';
+import { setUserNav } from './utilites.js';
+import { logoutApi } from './utilites.js';
+import { notify } from './utilites.js';
+
 import { catalogPage } from './views/catalog.js';
 import { createPage } from './views/create.js';
+import { detailsPage } from './views/details.js';
+import { editPage } from './views/edit.js';
 import { homePage } from './views/home.js';
 import { loginPage } from './views/login.js';
 import { registerPage } from './views/register.js';
-import { detailsPage } from './views/details.js';
-import { editPage } from './views/edit.js';
+import { myPage } from './views/profile.js';
 
-page('/', decorateContext, homePage);
-page('/login', decorateContext, loginPage);
-page('/register', decorateContext, registerPage);
-page('/catalog', decorateContext, catalogPage);
-page('/details/:id', decorateContext, detailsPage);
-page('/create', decorateContext, createPage);
-page('/edit/:id', decorateContext, editPage);
+import * as api from './api/data.js';
 
-const main = document.querySelector('main');
+window.api = api;
 
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await logout();
+page('/', renderMiddleware, homePage);
+page('/home', renderMiddleware, homePage);
+page('/details/:id', renderMiddleware, detailsPage);
+page('/create', renderMiddleware, createPage);
+page('/edit/:id', renderMiddleware, editPage);
+page('/register', renderMiddleware, registerPage);
+page('/login', renderMiddleware, loginPage);
+page('/catalog', renderMiddleware, catalogPage);
+page('/my-profile', renderMiddleware, myPage);
 
-    setUserNav();
-    page.redirect('/');
-});
+document.getElementById('logoutBtn').addEventListener('click', logoutApi);
 
 setUserNav();
 page.start();
-
-function decorateContext(ctx, next) {
-    ctx.render = (content) => render(content, main);
-    ctx.setUserNav = setUserNav;
-
-    next();
-}
-
-function setUserNav() {
-    const email = sessionStorage.getItem('email');
-
-    if (email != null) {
-        document.querySelector('div.profile > span').textContent = `Welcome, ${email}`;
-        document.querySelector('.user').style.display = 'block';
-        document.querySelector('.guest').style.display = 'none';
-    } else {
-        document.querySelector('.user').style.display = 'none';
-        document.querySelector('.guest').style.display = 'block';
-    }
-}
